@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-
+import { useState, useEffect, useRef } from "react";
 import pic1 from "./assets/pic1.jpeg";
 import pic2 from "./assets/pic2.jpeg";
 import pic3 from "./assets/pic3.jpeg";
@@ -8,788 +7,747 @@ import pic5 from "./assets/pic5.jpeg";
 import pic6 from "./assets/pic6.jpeg";
 import pic7 from "./assets/pic7.jpeg";
 
+const PHOTOS = [
+  { image: pic1, caption: "Beautiful Memory ❤️",  date: "Special Moment"    },
+  { image: pic2, caption: "Our Smile 🌸",          date: "Forever Together"  },
+  { image: pic3, caption: "Best Day 💕",            date: "Unforgettable"     },
+  { image: pic4, caption: "Just Us ✨",             date: "Pure Happiness"    },
+  { image: pic5, caption: "Lovely Memory 💌",       date: "Always Special"    },
+  { image: pic6, caption: "Golden Time 🌷",         date: "Beautiful Day"     },
+  { image: pic7, caption: "You & Me 💖",            date: "My Favorite"       },
+];
+
 const VALID_NAMES = ["khushi", "khushi bansal"];
-const VALID_PASS = "ilovekhushi";
+const VALID_PASS  = "ilovekhushi";
 
-const fonts = `@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Jost:wght@300;400;500&display=swap');`;
+const SONGS = [
+  {
+    title: "Tum Hi Ho",
+    artist: "Arijit Singh",
+    reason: "Every word feels like I wrote it for you",
+    color: "#c084fc",
+    yt: "Umqb9KENgmk",
+  },
+  {
+    title: "Tera Ban Jaunga",
+    artist: "Akhil Sachdeva",
+    reason: "This is exactly how I feel",
+    color: "#f472b6",
+    yt: "Qdz5n1Xe5Qo",
+  },
+  {
+    title: "Pehla Nasha",
+    artist: "Udit Narayan",
+    reason: "You gave me this feeling",
+    color: "#818cf8",
+    yt: "S4m3K6aqA2M",
+  },
+  {
+    title: "Jeena Jeena",
+    artist: "Atif Aslam",
+    reason: "You taught me what living feels like",
+    color: "#a78bfa",
+    yt: "zFhfksjf_mY",
+  },
+  {
+    title: "Ik Vaari Aa",
+    artist: "Arijit Singh",
+    reason: "Come back to me once more",
+    color: "#e879f9",
+    yt: "T4SimnaiktU",
+  },
+  {
+    title: "Main Rahoon Ya Na",
+    artist: "Armaan Malik",
+    reason: "My feelings for you will never change",
+    color: "#c084fc",
+    yt: "Dp6lbdoprZ0",
+  },
+  {
+    title: "Raabta",
+    artist: "Arijit Singh",
+    reason: "There is something cosmic between us",
+    color: "#818cf8",
+    yt: "zlt38OOqwDc",
+  },
+];
 
-const style = `
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --rose: #7c5cbf;
-    --rose-light: #c9b8e8;
-    --rose-pale: #f3eeff;
-    --rose-deep: #3b2070;
-    --cream: #faf8ff;
-    --petal: #ede4f7;
-    --text: #1e1030;
-    --muted: #6b5490;
-    --gold: #9b7fd4;
-    --nav-h: 64px;
-  }
-  html { scroll-behavior: smooth; }
-  body { font-family: 'Jost', sans-serif; background: var(--cream); color: var(--text); overflow-x: hidden; }
+const PROMISES = [
+  { icon:"🤝", title:"Never Repeat This",   body:"Whatever hurt you — I promise with my whole heart it will never happen again." },
+  { icon:"👂", title:"Always Listen",        body:"Your feelings come first. I'll listen before I speak, and truly understand you." },
+  { icon:"💪", title:"Be Better Every Day",  body:"Not just words — actions. Every single day, I'll show up worthy of you." },
+  { icon:"🌙", title:"Always Be There",      body:"In happy moments, hard days, random 2 AM thoughts — always, always there." },
+  { icon:"💬", title:"Communicate Openly",  body:"No more silence, no more assumptions. Open, honest, always." },
+  { icon:"🌸", title:"Choose You Daily",    body:"Not just when it's easy — on every ordinary day, I'll choose you. Always." },
+];
 
-  @keyframes petalFloat {
-    0%   { transform: translateY(0px)   rotate(0deg)   scale(1);   opacity: 0.18; }
-    33%  { transform: translateY(-22px) rotate(9deg)   scale(1.06); opacity: 0.24; }
-    66%  { transform: translateY(-9px)  rotate(-6deg)  scale(0.96); opacity: 0.16; }
-    100% { transform: translateY(0px)   rotate(0deg)   scale(1);   opacity: 0.18; }
-  }
-  .petal-float { position: absolute; pointer-events: none; animation: petalFloat var(--dur) ease-in-out infinite; animation-delay: var(--delay); user-select: none; }
+const TIMELINE = [
+  { icon:"💫", title:"The Moment I Noticed You",    date:"The Very Beginning",    body:"There was something about you — the way you carried yourself, the way you laughed. I knew then that you were different." },
+  { icon:"☕", title:"Our First Real Conversation",  date:"Getting to Know You",   body:"We talked for hours and it felt like minutes. I thought: I never want this to end. And I still don't." },
+  { icon:"💕", title:"When I Realised I Loved You",  date:"A Quiet Revelation",    body:"It wasn't a grand moment — something small, quiet. And I thought: oh. It's you. It's always been you." },
+  { icon:"🌟", title:"The Best Days with You",       date:"Everything in Between", body:"Every laugh, every plan, every inside joke — the small, ordinary, extraordinary moments I treasure most." },
+  { icon:"💔", title:"When I Hurt You",              date:"My Biggest Regret",     body:"I made a mistake. Seeing the hurt on your face was the worst feeling I have ever known. I'm so sorry." },
+  { icon:"🌸", title:"The Promise I Make Now",       date:"From This Day Forward", body:"I choose to be better. I choose you — every day, in every way. This is my heart, not just a webpage." },
+];
 
-  @keyframes fadeUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
-  @keyframes heartBeat { 0%,100%{transform:scale(1);} 14%{transform:scale(1.35);} 28%{transform:scale(1);} 42%{transform:scale(1.18);} 70%{transform:scale(1);} }
-  @keyframes shimmer { 0%{background-position:200% center;} 100%{background-position:-200% center;} }
-  @keyframes borderPulse { 0%,100%{box-shadow:0 0 0 0 rgba(124,92,191,0);} 50%{box-shadow:0 0 24px 6px rgba(124,92,191,0.16);} }
-  @keyframes ticker { from{transform:translateX(0%);} to{transform:translateX(-50%);} }
-  @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(9px);} }
-  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
-  @keyframes floatUp { 0%{opacity:1;transform:translateY(0) scale(1);} 100%{opacity:0;transform:translateY(-80px) scale(1.4);} }
-  @keyframes spin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
-  @keyframes slideIn { from{opacity:0;transform:translateX(-30px);} to{opacity:1;transform:translateX(0);} }
-  @keyframes scaleIn { from{opacity:0;transform:scale(0.85);} to{opacity:1;transform:scale(1);} }
-  @keyframes shake { 0%,100%{transform:translateX(0);} 20%,60%{transform:translateX(-8px);} 40%,80%{transform:translateX(8px);} }
+const WISHES = [
+  { icon:"🌟", title:"Only Happiness",    body:"Every morning, I want you to wake up to peace, warmth, and joy. You deserve all of that and more." },
+  { icon:"💪", title:"Strength Always",   body:"In hard days, long nights, quiet doubts — I wish you the strength to know you are more than enough." },
+  { icon:"🌸", title:"Feel Loved",        body:"Not just by me — by the whole world. Someone as beautiful as you deserves to be surrounded by love." },
+  { icon:"✨", title:"A Second Chance",   body:"If you find it in your heart to forgive me, I'll spend every day making you glad you did." },
+];
 
-  /* ── LOGIN ── */
-  .login-wrap {
-    min-height:100vh; display:flex; align-items:center; justify-content:center;
-    background: radial-gradient(ellipse at 30% 30%, #e8d8ff 0%, #f5f0ff 45%, #ede8ff 100%);
-    position:relative; overflow:hidden; padding:40px 20px;
-  }
-  .login-card {
-    background:rgba(255,255,255,0.85); backdrop-filter:blur(20px);
-    border:1.5px solid rgba(201,184,232,0.7); border-radius:32px;
-    padding:48px 44px; width:100%; max-width:430px; z-index:2;
-    animation:fadeUp 0.9s ease both, borderPulse 3s ease-in-out 1.2s infinite;
-    text-align:center;
-  }
-  .login-hearts { font-size:30px; letter-spacing:14px; animation:heartBeat 2.2s ease-in-out infinite; display:block; margin-bottom:22px; }
-  .login-headline {
-    font-family:'Playfair Display',serif; font-size:36px; font-weight:700; font-style:italic;
-    background:linear-gradient(90deg,#7c5cbf,#b49de0,#9b7fd4,#b49de0,#7c5cbf);
-    background-size:300% auto; -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    animation:shimmer 4s linear infinite; line-height:1.2; margin-bottom:10px;
-  }
-  .login-sub { font-size:12px; color:var(--muted); letter-spacing:1.8px; margin-bottom:34px; text-transform:uppercase; }
-  .field-wrap { text-align:left; margin-bottom:18px; }
-  .field-label { font-size:10px; text-transform:uppercase; letter-spacing:1.8px; color:var(--muted); margin-bottom:7px; display:block; }
-  .field-input {
-    width:100%; padding:14px 18px; border:1.5px solid var(--rose-light);
-    border-radius:14px; font-size:14px; font-family:'Jost',sans-serif;
-    color:var(--text); background:rgba(250,248,255,0.9); outline:none;
-    transition:border-color 0.2s, box-shadow 0.2s;
-  }
-  .field-input:focus { border-color:var(--rose); box-shadow:0 0 0 3px rgba(124,92,191,0.1); }
-  .login-err { font-size:12.5px; color:var(--rose); min-height:20px; margin-bottom:10px; animation:fadeUp 0.3s ease; }
-  .login-btn {
-    width:100%; padding:15px; background:var(--rose); color:white; border:none;
-    border-radius:16px; font-size:16px; font-family:'Playfair Display',serif;
-    font-weight:600; font-style:italic; cursor:pointer;
-    transition:background 0.2s, transform 0.15s, box-shadow 0.2s;
-    box-shadow:0 8px 28px rgba(124,92,191,0.32);
-  }
-  .login-btn:hover { background:#5e3fa3; box-shadow:0 12px 36px rgba(124,92,191,0.42); transform:translateY(-2px); }
-  .login-btn:active { transform:scale(0.97); }
-  .login-hint { font-size:11px; color:#a090c8; margin-top:14px; font-weight:300; }
+const EMOJIS = ["🌸","💜","✨","💕","🌷","💝","💌","🦋","⭐","🌹"];
 
-  /* ── ANNOUNCE ── */
-  .announce { background:var(--rose); color:white; font-size:11.5px; padding:9px 0; overflow:hidden; white-space:nowrap; letter-spacing:0.5px; }
-  .announce-inner { display:inline-block; animation:ticker 30s linear infinite; }
-
-  /* ── HEADER / NAV ── */
-  .site-header {
-    background:rgba(255,255,255,0.93); border-bottom:1px solid #ede4f7;
-    padding:0 48px; height:var(--nav-h); display:flex; align-items:center; justify-content:space-between;
-    position:sticky; top:0; z-index:200; backdrop-filter:blur(12px);
-  }
-  .header-logo { font-family:'Playfair Display',serif; font-size:26px; font-weight:700; color:var(--rose); line-height:1; cursor:pointer; }
-  .header-logo span { font-size:10px; display:block; font-weight:400; color:var(--muted); letter-spacing:2.5px; font-family:'Jost',sans-serif; font-style:normal; }
-  .header-nav { display:flex; gap:6px; }
-  .nav-link {
-    padding:7px 16px; border-radius:30px; font-size:13px; color:var(--muted);
-    cursor:pointer; transition:all 0.2s; text-decoration:none; border:1px solid transparent;
-    font-weight:400;
-  }
-  .nav-link:hover { color:var(--rose); background:var(--rose-pale); border-color:var(--rose-light); }
-  .nav-link.active { color:var(--rose); background:var(--rose-pale); border-color:var(--rose-light); font-weight:500; }
-
-  /* ── SECTIONS ── */
-  .page { display:none; }
-  .page.active { display:block; animation:fadeUp 0.5s ease; }
-
-  /* ── HERO ── */
-  .hero {
-    min-height:calc(100vh - var(--nav-h) - 38px); display:flex; align-items:center; justify-content:center;
-    position:relative; overflow:hidden;
-    background:radial-gradient(ellipse at 65% 42%, #e8d8ff 0%, #f5f0ff 50%, #ede8ff 100%);
-    padding:80px 40px;
-  }
-  .hero-content { text-align:center; z-index:2; position:relative; max-width:600px; }
-  .hero-tag {
-    display:inline-block; background:rgba(124,92,191,0.08); color:var(--rose);
-    font-size:11px; letter-spacing:3px; padding:7px 20px; border-radius:20px;
-    border:1px solid rgba(124,92,191,0.2); margin-bottom:28px;
-    animation:fadeUp 0.7s ease both; text-transform:uppercase;
-  }
-  .hero-h1 {
-    font-family:'Playfair Display',serif; font-size:clamp(44px,8vw,72px);
-    font-weight:700; line-height:1.1; color:var(--rose-deep);
-    animation:fadeUp 0.8s 0.15s ease both; margin-bottom:26px;
-  }
-  .hero-h1 em { font-style:italic; color:var(--rose); }
-  .hero-p {
-    font-size:16px; color:var(--muted); line-height:2; max-width:460px; margin:0 auto 40px;
-    animation:fadeUp 0.8s 0.3s ease both; font-weight:300;
-  }
-  .hero-actions { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; animation:fadeUp 0.8s 0.45s ease both; }
-  .btn-primary {
-    padding:15px 38px; background:var(--rose); color:white; border:none;
-    border-radius:40px; font-size:15px; font-family:'Playfair Display',serif;
-    font-weight:600; font-style:italic; cursor:pointer; transition:all 0.22s;
-    box-shadow:0 8px 30px rgba(124,92,191,0.32);
-  }
-  .btn-primary:hover { transform:translateY(-3px); box-shadow:0 16px 44px rgba(124,92,191,0.40); }
-  .btn-ghost {
-    padding:15px 38px; background:transparent; color:var(--rose);
-    border:1.5px solid var(--rose); border-radius:40px; font-size:15px;
-    font-family:'Playfair Display',serif; font-weight:600; font-style:italic; cursor:pointer; transition:all 0.22s;
-  }
-  .btn-ghost:hover { background:var(--rose-pale); transform:translateY(-2px); }
-  .hero-scroll { position:absolute; bottom:36px; left:50%; transform:translateX(-50%); font-size:24px; animation:bounce 2.2s ease-in-out infinite; color:var(--rose); opacity:0.6; cursor:pointer; }
-  .hero-stats { display:flex; gap:40px; justify-content:center; margin-top:48px; animation:fadeUp 0.8s 0.6s ease both; }
-  .stat-item { text-align:center; }
-  .stat-num { font-family:'Playfair Display',serif; font-size:32px; font-weight:700; color:var(--rose); line-height:1; }
-  .stat-label { font-size:11px; color:var(--muted); letter-spacing:1.5px; margin-top:4px; text-transform:uppercase; }
-
-  /* ── SHARED SECTION ── */
-  .section { padding:100px 48px; }
-  .section-label { font-size:10px; letter-spacing:3.5px; color:var(--rose); text-transform:uppercase; margin-bottom:12px; }
-  .section-h2 { font-family:'Playfair Display',serif; font-size:clamp(28px,5vw,46px); font-weight:700; color:var(--rose-deep); line-height:1.22; margin-bottom:20px; }
-  .section-h2 em { font-style:italic; }
-
-  /* ── STORY ── */
-  .story-grid { display:grid; grid-template-columns:1fr 1fr; gap:70px; align-items:center; max-width:880px; margin:0 auto; }
-  .story-img {
-    width:100%; aspect-ratio:1; border-radius:32px;
-    background:linear-gradient(135deg,#ede4f7,#d8c8f0,#e8d8ff);
-    display:flex; align-items:center; justify-content:center; font-size:120px;
-    box-shadow:0 28px 70px rgba(124,92,191,0.14), 0 0 0 1px rgba(201,184,232,0.5);
-    position:relative; overflow:hidden;
-  }
-  .story-img::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,0.28),transparent); }
-  .story-badge {
-    position:absolute; bottom:-16px; right:-16px;
-    background:var(--rose); color:white; border-radius:50%; width:76px; height:76px;
-    display:flex; align-items:center; justify-content:center; font-size:32px;
-    box-shadow:0 10px 28px rgba(124,92,191,0.38); border:3px solid white;
-  }
-  .story-img-wrap { position:relative; }
-  .story-text p { font-size:15.5px; color:var(--muted); line-height:2.1; font-weight:300; margin-bottom:16px; }
-  .story-btn { margin-top:10px; padding:13px 30px; background:transparent; border:1.5px solid var(--rose); color:var(--rose); border-radius:30px; font-size:14px; font-family:'Playfair Display',serif; font-weight:600; font-style:italic; cursor:pointer; transition:all 0.2s; }
-  .story-btn:hover { background:var(--rose); color:white; }
-
-  /* ── PROMISES ── */
-  .promises-bg { background:white; }
-  .promises-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; max-width:860px; margin:52px auto 0; }
-  .promise-card {
-    background:var(--rose-pale); border:1px solid rgba(201,184,232,0.5);
-    border-radius:24px; padding:32px 26px; transition:transform 0.25s, box-shadow 0.25s;
-    position:relative; overflow:hidden; cursor:default;
-  }
-  .promise-card::before { content:''; position:absolute; top:-28px; right:-28px; width:90px; height:90px; border-radius:50%; background:rgba(124,92,191,0.05); }
-  .promise-card:hover { transform:translateY(-8px); box-shadow:0 24px 60px rgba(124,92,191,0.13); }
-  .promise-icon { font-size:42px; margin-bottom:16px; display:block; }
-  .promise-card h3 { font-family:'Playfair Display',serif; font-size:19px; color:var(--rose); margin-bottom:10px; font-weight:700; }
-  .promise-card p { font-size:13.5px; color:var(--muted); line-height:1.9; font-weight:300; }
-  .promise-num { position:absolute; top:16px; right:20px; font-family:'Playfair Display',serif; font-size:56px; font-weight:700; color:rgba(124,92,191,0.06); line-height:1; }
-
-  /* ── LETTER ── */
-  .letter-bg { background:radial-gradient(ellipse at center,#f3eeff,var(--cream)); }
-  .letter-wrap { max-width:640px; margin:0 auto; }
-  .letter-paper {
-    background:white; border-radius:28px; padding:56px 56px;
-    box-shadow:0 36px 90px rgba(124,92,191,0.10), 0 0 0 1px rgba(201,184,232,0.4);
-    position:relative; overflow:hidden;
-  }
-  .letter-paper::before { content:''; position:absolute; top:0; left:0; right:0; height:6px; background:linear-gradient(90deg,var(--rose),#b49de0,var(--gold),#b49de0,var(--rose)); }
-  .letter-paper::after { content:'"'; position:absolute; top:28px; right:40px; font-family:'Playfair Display',serif; font-size:140px; font-weight:700; color:rgba(124,92,191,0.04); line-height:1; pointer-events:none; }
-  .letter-date { font-size:12px; color:#a090c8; letter-spacing:1.2px; margin-bottom:26px; }
-  .letter-salute { font-family:'Playfair Display',serif; font-size:28px; font-style:italic; color:var(--rose); margin-bottom:24px; }
-  .letter-body { font-size:15.5px; color:var(--muted); line-height:2.15; font-weight:300; }
-  .letter-body p { margin-bottom:20px; }
-  .letter-sign-wrap { margin-top:38px; display:flex; flex-direction:column; align-items:flex-end; gap:4px; }
-  .letter-sign { font-family:'Playfair Display',serif; font-size:24px; font-style:italic; color:var(--rose); }
-  .letter-hearts { font-size:24px; letter-spacing:8px; margin-top:10px; text-align:center; }
-
-  /* ── PHOTOS ── */
-  .photos-bg { background:white; }
-  .photos-header { text-align:center; margin-bottom:52px; }
-  .photo-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; max-width:900px; margin:0 auto; }
-  .photo-card {
-    border-radius:22px; overflow:hidden; position:relative;
-    aspect-ratio:4/5; cursor:pointer; transition:transform 0.35s, box-shadow 0.35s;
-    box-shadow:0 6px 24px rgba(124,92,191,0.09);
-  }
-  .photo-card:hover { transform:scale(1.035) rotate(-1deg); box-shadow:0 20px 50px rgba(124,92,191,0.18); }
-  .photo-card:hover .photo-overlay { opacity:1; }
-  .photo-inner { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:72px; position:relative; }
-  .photo-inner img { width:100%; height:100%; object-fit:cover; display:block; }
-  .photo-overlay {
-    position:absolute; inset:0; background:linear-gradient(to top, rgba(59,32,112,0.85) 0%, transparent 60%);
-    display:flex; flex-direction:column; justify-content:flex-end; padding:20px;
-    opacity:0; transition:opacity 0.3s;
-  }
-  .photo-caption { color:white; font-size:13px; font-family:'Playfair Display',serif; font-style:italic; font-weight:400; }
-  .photo-date { color:rgba(255,255,255,0.65); font-size:11px; margin-top:3px; letter-spacing:1px; }
-  .photo-featured { grid-column:span 2; aspect-ratio:16/9; }
-
-  /* ── TIMELINE ── */
-  .timeline-bg { background:radial-gradient(ellipse at 70% 30%, #f3eeff, var(--cream) 60%); }
-  .timeline-wrap { max-width:680px; margin:0 auto; position:relative; }
-  .timeline-line {
-    position:absolute; left:36px; top:20px; bottom:20px; width:2px;
-    background:linear-gradient(to bottom, var(--rose-light), var(--rose), var(--rose-light));
-    border-radius:2px;
-  }
-  .timeline-item { display:flex; gap:32px; margin-bottom:48px; align-items:flex-start; animation:slideIn 0.5s ease both; }
-  .timeline-dot {
-    width:72px; height:72px; border-radius:50%; background:white;
-    border:3px solid var(--rose); display:flex; align-items:center; justify-content:center;
-    font-size:28px; flex-shrink:0; position:relative; z-index:1;
-    box-shadow:0 6px 22px rgba(124,92,191,0.18);
-  }
-  .timeline-body { background:white; border-radius:20px; padding:24px 28px; flex:1; border:1px solid rgba(201,184,232,0.5); box-shadow:0 4px 20px rgba(124,92,191,0.07); }
-  .timeline-body h3 { font-family:'Playfair Display',serif; font-size:20px; color:var(--rose); margin-bottom:6px; font-weight:700; }
-  .timeline-body .tl-date { font-size:11px; color:var(--gold); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:10px; display:block; }
-  .timeline-body p { font-size:14px; color:var(--muted); line-height:1.9; font-weight:300; }
-
-  /* ── PLAYLIST ── */
-  .playlist-bg { background:white; }
-  .playlist-header { text-align:center; margin-bottom:52px; }
-  .playlist-wrap { max-width:640px; margin:0 auto; }
-  .playlist-card {
-    background:white; border:1px solid rgba(201,184,232,0.6); border-radius:18px;
-    padding:18px 22px; display:flex; align-items:center; gap:18px;
-    margin-bottom:14px; transition:all 0.25s; cursor:pointer; position:relative; overflow:hidden;
-  }
-  .playlist-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--rose); transform:scaleY(0); transition:transform 0.2s; border-radius:2px 0 0 2px; }
-  .playlist-card:hover { background:var(--rose-pale); transform:translateX(6px); border-color:var(--rose-light); }
-  .playlist-card:hover::before { transform:scaleY(1); }
-  .playlist-card.playing { background:var(--rose-pale); border-color:var(--rose); }
-  .playlist-card.playing::before { transform:scaleY(1); }
-  .song-num { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:rgba(124,92,191,0.2); min-width:32px; }
-  .song-info { flex:1; }
-  .song-title { font-size:15px; font-weight:500; color:var(--text); margin-bottom:3px; }
-  .song-artist { font-size:12.5px; color:var(--muted); font-weight:300; }
-  .song-reason { font-size:11.5px; color:var(--rose); margin-top:5px; font-style:italic; }
-  .song-emoji { font-size:28px; }
-  .song-dur { font-size:12px; color:var(--muted); min-width:36px; text-align:right; }
-  .playlist-note { margin-top:32px; text-align:center; padding:22px; background:var(--rose-pale); border-radius:16px; border:1px solid rgba(201,184,232,0.5); }
-  .playlist-note p { font-size:14px; color:var(--muted); line-height:1.9; }
-
-  /* ── WISH / MESSAGE ── */
-  .wish-bg { background:radial-gradient(ellipse at center, #f3eeff, var(--cream)); }
-  .wish-wrap { max-width:680px; margin:0 auto; }
-  .wish-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:40px; }
-  .wish-card {
-    background:white; border-radius:22px; padding:28px 26px;
-    border:1px solid rgba(201,184,232,0.5); box-shadow:0 6px 28px rgba(124,92,191,0.07);
-    transition:transform 0.25s; cursor:default;
-  }
-  .wish-card:hover { transform:translateY(-4px); }
-  .wish-card-icon { font-size:38px; margin-bottom:14px; }
-  .wish-card h3 { font-family:'Playfair Display',serif; font-size:18px; color:var(--rose); margin-bottom:8px; }
-  .wish-card p { font-size:13.5px; color:var(--muted); line-height:1.9; font-weight:300; }
-  .wish-message {
-    background:white; border-radius:28px; padding:44px 44px;
-    box-shadow:0 28px 80px rgba(124,92,191,0.10); border:1px solid rgba(201,184,232,0.4);
-    text-align:center; position:relative; overflow:hidden;
-  }
-  .wish-message::before { content:''; position:absolute; top:0; left:0; right:0; height:5px; background:linear-gradient(90deg,var(--rose),var(--gold),var(--rose)); }
-  .wish-input-area { width:100%; border:1.5px solid var(--rose-light); border-radius:16px; padding:16px 18px; font-size:14.5px; font-family:'Jost',sans-serif; color:var(--text); resize:none; outline:none; line-height:1.7; margin:20px 0; background:var(--cream); transition:border-color 0.2s; }
-  .wish-input-area:focus { border-color:var(--rose); }
-  .wish-submit { padding:14px 40px; background:var(--rose); color:white; border:none; border-radius:40px; font-size:15px; font-family:'Playfair Display',serif; font-weight:600; font-style:italic; cursor:pointer; transition:all 0.2s; box-shadow:0 6px 24px rgba(124,92,191,0.28); }
-  .wish-submit:hover { background:#5e3fa3; transform:translateY(-2px); }
-  .wish-response { margin-top:24px; padding:22px 26px; background:var(--rose-pale); border-radius:16px; font-size:14.5px; color:var(--muted); line-height:1.9; text-align:left; font-style:italic; display:none; }
-  .heart-burst { position:fixed; pointer-events:none; z-index:9999; font-size:26px; animation:floatUp 1.2s ease forwards; }
-
-  /* ── FOOTER ── */
-  .site-footer { background:#1e1030; color:#d8c8f0; text-align:center; padding:64px 24px; position:relative; overflow:hidden; }
-  .footer-bg-text { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-size:200px; font-weight:700; color:rgba(255,255,255,0.025); pointer-events:none; line-height:1; letter-spacing:-10px; }
-  .footer-rose { font-size:64px; display:block; margin-bottom:18px; }
-  .footer-h { font-family:'Playfair Display',serif; font-size:32px; font-weight:700; font-style:italic; margin-bottom:12px; }
-  .footer-sub { font-size:13px; opacity:0.5; letter-spacing:1.2px; font-weight:300; }
-  .footer-hearts { margin-top:28px; font-size:20px; letter-spacing:10px; opacity:0.4; }
-
-  /* ── FULL SCREEN FIX ── */
-  html, body, #root { margin:0 !important; padding:0 !important; width:100% !important; min-height:100vh; overflow-x:hidden; }
-  body { display:block; }
-  #root { width:100vw; max-width:100vw; }
-  .site-header, .hero, .section, .site-footer, .page { width:100%; }
-  .section { padding-left:5vw !important; padding-right:5vw !important; }
-  .hero { min-height:100vh !important; }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width:680px) {
-    .story-grid { grid-template-columns:1fr; gap:36px; }
-    .promises-grid { grid-template-columns:1fr; }
-    .photo-grid { grid-template-columns:1fr 1fr; }
-    .photo-featured { grid-column:span 2; aspect-ratio:4/3; }
-    .header-nav { display:none; }
-    .letter-paper { padding:36px 26px; }
-    .site-header { padding:0 20px; }
-    .section { padding:70px 20px; }
-    .hero { padding:60px 20px; }
-    .wish-grid { grid-template-columns:1fr; }
-    .timeline-line { left:28px; }
-    .timeline-dot { width:56px; height:56px; font-size:22px; }
-    .wish-message { padding:32px 24px; }
-  }
-`;
-
-const FloatingPetals = ({ count = 18 }) => {
-  const items = Array.from({ length: count }, (_, i) => ({
-    emoji: ["🌸", "♥", "💜", "✨", "💕", "🌷", "💝", "💌"][i % 8],
-    left: `${5 + (i * 5.2) % 90}%`,
-    top: `${5 + (i * 7.3) % 88}%`,
-    dur: `${5 + (i % 4)}s`,
-    delay: `${(i * 0.4) % 4}s`,
-    size: `${14 + (i % 3) * 8}px`,
+function Particles({ count=30 }) {
+  const items = Array.from({length:count},(_,i)=>({
+    emoji: EMOJIS[i%EMOJIS.length],
+    left: `${3+(i*3.17)%94}%`,
+    top:  `${2+(i*6.13)%96}%`,
+    size: `${12+(i%4)*7}px`,
+    dur:  `${6+(i%5)*2}s`,
+    delay:`${(i*0.35)%5}s`,
+    opacity: 0.12+(i%5)*0.04,
   }));
-  return (
-    <>
-      {items.map((p, i) => (
-        <span key={i} className="petal-float"
-          style={{ left: p.left, top: p.top, "--dur": p.dur, "--delay": p.delay, fontSize: p.size }}>
-          {p.emoji}
-        </span>
-      ))}
-    </>
-  );
-};
+  return <>{items.map((p,i)=>(
+    <span key={i} style={{
+      position:"absolute", pointerEvents:"none", userSelect:"none",
+      left:p.left, top:p.top, fontSize:p.size, opacity:p.opacity,
+      animation:`particleFloat ${p.dur} ease-in-out ${p.delay} infinite`,
+    }}>{p.emoji}</span>
+  ))}</>;
+}
 
-const LoginScreen = ({ onLogin }) => {
-  const [name, setName] = useState("");
-  const [pass, setPass] = useState("");
-  const [err, setErr] = useState("");
-  const [shaking, setShaking] = useState(false);
+function HeartBurst({x,y,onDone}) {
+  useEffect(()=>{const t=setTimeout(onDone,1400);return()=>clearTimeout(t);},[]);
+  return <div style={{position:"fixed",left:x-16,top:y-16,fontSize:28,pointerEvents:"none",zIndex:9999,animation:"heartRise 1.4s ease forwards"}}>💜</div>;
+}
 
-  const attempt = () => {
-    const n = name.trim().toLowerCase();
-    const p = pass.trim().toLowerCase();
-    if (VALID_NAMES.includes(n) && p === VALID_PASS) {
-      onLogin();
-    } else {
-      setErr("💜 Hmm, that doesn't match. Try again, love!");
-      setShaking(true);
-      setTimeout(() => { setErr(""); setShaking(false); }, 2200);
-    }
-  };
+function MusicPlayer() {
+  const [idx, setIdx] = useState(0);
+  const song = SONGS[idx];
 
   return (
-    <div className="login-wrap">
-      <FloatingPetals count={24} />
+    <div
+      style={{
+        background: "rgba(20,10,40,0.96)",
+        borderRadius: 32,
+        padding: "40px",
+        border: "1px solid rgba(180,157,224,0.25)",
+        backdropFilter: "blur(24px)",
+        maxWidth: 560,
+        margin: "0 auto",
+        boxShadow: "0 40px 100px rgba(0,0,0,0.5)",
+      }}
+    >
+      {/* YouTube Player */}
       <div
-        className="login-card"
-        style={shaking ? { animation: "fadeUp 0.9s ease both, borderPulse 3s ease-in-out 1.2s infinite, shake 0.4s ease" } : {}}
+        style={{
+          borderRadius: 20,
+          overflow: "hidden",
+          marginBottom: 28,
+          boxShadow: `0 0 40px ${song.color}44`,
+        }}
       >
-        <span className="login-hearts">♥ ♥ ♥</span>
-        <h1 className="login-headline">A Little Something<br />Just for You</h1>
-        <p className="login-sub">Private · Made with love · Only for you 🌸</p>
-        <div className="field-wrap">
-          <label className="field-label">Your name</label>
-          <input
-            className="field-input"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            placeholder="Enter your name…"
-            onKeyDown={e => e.key === "Enter" && attempt()}
-          />
+     <iframe
+  width="100%"
+  height="300"
+  src={`https://www.youtube.com/embed/${song.yt}`}
+  title={song.title}
+  frameBorder="0"
+  allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+/>
+      </div>
+
+      {/* Song info */}
+      <div style={{ textAlign: "center", marginBottom: 28 }}>
+        <div
+          style={{
+            fontSize: 22,
+            fontFamily: "'Playfair Display', serif",
+            fontWeight: 700,
+            color: "white",
+            marginBottom: 6,
+          }}
+        >
+          {song.title}
         </div>
-        <div className="field-wrap">
-          <label className="field-label">Secret password</label>
-          <input
-            className="field-input"
-            type="password"
-            value={pass}
-            onChange={e => setPass(e.target.value)}
-            placeholder="Enter password…"
-            onKeyDown={e => e.key === "Enter" && attempt()}
-          />
+
+        <div
+          style={{
+            fontSize: 14,
+            color: "rgba(255,255,255,0.5)",
+            letterSpacing: 1,
+          }}
+        >
+          {song.artist}
         </div>
-        <div className="login-err">{err || " "}</div>
-        <button className="login-btn" onClick={attempt}>Open with Love 💌</button>
-        <p className="login-hint">Psst… only one person in this world knows the password 🤫</p>
+
+        <div
+          style={{
+            fontSize: 12,
+            color: song.color,
+            fontStyle: "italic",
+            marginTop: 8,
+          }}
+        >
+          "{song.reason}"
+        </div>
+      </div>
+
+      {/* Controls */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: 20,
+        }}
+      >
+        <button
+          onClick={() =>
+            setIdx((idx - 1 + SONGS.length) % SONGS.length)
+          }
+          style={{
+            background: song.color,
+            border: "none",
+            color: "white",
+            width: 55,
+            height: 55,
+            borderRadius: "50%",
+            cursor: "pointer",
+            fontSize: 20,
+          }}
+        >
+          ⏮
+        </button>
+
+        <button
+          onClick={() =>
+            setIdx((idx + 1) % SONGS.length)
+          }
+          style={{
+            background: song.color,
+            border: "none",
+            color: "white",
+            width: 55,
+            height: 55,
+            borderRadius: "50%",
+            cursor: "pointer",
+            fontSize: 20,
+          }}
+        >
+          ⏭
+        </button>
+      </div>
+
+      {/* Playlist */}
+      <div
+        style={{
+          marginTop: 30,
+          borderTop: "1px solid rgba(255,255,255,0.08)",
+          paddingTop: 20,
+        }}
+      >
+        {SONGS.map((s, i) => (
+          <div
+            key={i}
+            onClick={() => setIdx(i)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              padding: "12px",
+              borderRadius: 12,
+              cursor: "pointer",
+              background:
+                i === idx
+                  ? "rgba(180,157,224,0.12)"
+                  : "transparent",
+              marginBottom: 6,
+            }}
+          >
+            <div
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: 8,
+                background: s.color,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "white",
+              }}
+            >
+              🎵
+            </div>
+
+            <div>
+              <div style={{ color: "white" }}>
+                {s.title}
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "rgba(255,255,255,0.5)",
+                }}
+              >
+                {s.artist}
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
-};
+}
 
-const HeartBurst = ({ x, y, onDone }) => {
+function Lightbox({ photo, idx, total, onClose, onPrev, onNext }) {
   useEffect(() => {
-    const t = setTimeout(onDone, 1300);
-    return () => clearTimeout(t);
+    const fn = (e) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft") onPrev();
+      if (e.key === "ArrowRight") onNext();
+    };
+    window.addEventListener("keydown", fn);
+    return () => window.removeEventListener("keydown", fn);
   }, []);
-  return <div className="heart-burst" style={{ left: x - 13, top: y - 13 }}>💜</div>;
-};
-
-const MainSite = () => {
-  const [page, setPage] = useState("home");
-  const [hearts, setHearts] = useState([]);
-  const [wishText, setWishText] = useState("");
-  const [wishSent, setWishSent] = useState(false);
-  const [playingIdx, setPlayingIdx] = useState(null);
-
-  const tickerText = "✦ I'm sorry, Khushi ✦ You are my everything ✦ I miss your smile ✦ I promise I'll be better ✦ Please forgive me ✦ You deserve the world ✦ This will never happen again ✦ I love you, Khushi Bansal ✦ ";
-
-  const promises = [
-    { icon: "🤝", title: "I will never repeat this", body: "Whatever hurt you — I promise with my whole heart it will never happen again. Never, ever.", n: "01" },
-    { icon: "👂", title: "I will always listen", body: "Your feelings come first. I'll listen before I speak, and truly understand you.", n: "02" },
-    { icon: "💪", title: "I will be better", body: "Not just in words — in actions. Every single day, I'll show up worthy of you.", n: "03" },
-    { icon: "🌙", title: "I'll always be there", body: "In your happy moments, hard days, random 2 AM thoughts — always, always there.", n: "04" },
-    { icon: "💬", title: "I will communicate", body: "No more silence, no more assumptions. Open, honest, always.", n: "05" },
-    { icon: "🌸", title: "I'll choose you daily", body: "Not just when it's easy — on every ordinary day, I'll choose you. Always.", n: "06" },
-  ];
-
-  const photos = [
-    { image: pic1, caption: "Beautiful Memory ❤️", date: "Special Moment" },
-    { image: pic2, caption: "Our Smile 🌸", date: "Forever Together" },
-    { image: pic3, caption: "Best Day 💕", date: "Unforgettable" },
-    { image: pic4, caption: "Just Us ✨", date: "Pure Happiness" },
-    { image: pic5, caption: "Lovely Memory 💌", date: "Always Special" },
-    { image: pic6, caption: "Golden Time 🌷", date: "Beautiful Day" },
-    { image: pic7, caption: "You & Me 💖", date: "My Favorite" },
-  ];
-
-  const timeline = [
-    { icon: "💫", title: "The Moment I Noticed You", date: "The Very Beginning", body: "There was something about you — the way you carried yourself, the way you laughed. I knew then that you were different. That you were special." },
-    { icon: "☕", title: "Our First Real Conversation", date: "Getting to Know You", body: "We talked for hours and it felt like minutes. I remember thinking: I never want this to end. And I still don't." },
-    { icon: "💕", title: "When I Realised I Loved You", date: "A Quiet Revelation", body: "It wasn't a grand moment. It was something small — and I thought: oh. It's you. It's always been you." },
-    { icon: "🌟", title: "The Best Days with You", date: "Everything in Between", body: "Every laugh, every plan, every inside joke, every message — those are the things I treasure most. The small, ordinary, extraordinary moments." },
-    { icon: "💔", title: "When I Hurt You", date: "My Biggest Regret", body: "I made a mistake. And seeing the hurt on your face was the worst feeling I have ever known. I am so deeply sorry, Khushi." },
-    { icon: "🌸", title: "The Promise I'm Making Now", date: "From This Day Forward", body: "I choose to be better. I choose you — every day, in every way. This is not just a page on the internet. This is my heart." },
-  ];
-
-  const songs = [
-    { title: "Tum Hi Ho", artist: "Arijit Singh", reason: "Every word feels like I wrote it for you", emoji: "🎵", dur: "4:22" },
-    { title: "Tera Ban Jaunga", artist: "Akhil Sachdeva", reason: "This is exactly how I feel", emoji: "🎶", dur: "3:47" },
-    { title: "Pehla Nasha", artist: "Udit Narayan", reason: "You gave me this feeling", emoji: "🎵", dur: "5:10" },
-    { title: "Jeena Jeena", artist: "Atif Aslam", reason: "You taught me what living feels like", emoji: "🎶", dur: "3:38" },
-    { title: "Ik Vaari Aa", artist: "Arijit Singh", reason: "Come back to me once more", emoji: "🎵", dur: "4:05" },
-    { title: "Main Rahoon Ya Na Rahoon", artist: "Armaan Malik", reason: "My feelings for you will never change", emoji: "🎶", dur: "4:51" },
-    { title: "Raabta", artist: "Arijit Singh", reason: "There is something cosmic between us", emoji: "🎵", dur: "3:55" },
-  ];
-
-  const wishes = [
-    { icon: "🌟", title: "I wish you only happiness", body: "Every single morning, I want you to wake up to peace, warmth, and joy. You deserve all of that and more." },
-    { icon: "💪", title: "I wish you strength", body: "In your hard days, your long nights, your doubts — I wish you the strength to know you are more than enough." },
-    { icon: "🌸", title: "I wish you to feel loved", body: "Not just by me — but by the world. Because someone as beautiful as you deserves to be surrounded by love." },
-    { icon: "✨", title: "I wish us a second chance", body: "If you find it in your heart to forgive me, I promise I will spend every day making you glad you did." },
-  ];
-
-  const spawnHearts = (e) => {
-    const newHeart = { id: Date.now(), x: e.clientX, y: e.clientY };
-    setHearts(h => [...h, newHeart]);
-  };
-
-  const navLinks = [
-    { key: "home", label: "Home" },
-    { key: "story", label: "Our Story" },
-    { key: "promises", label: "Promises" },
-    { key: "photos", label: "Photos" },
-    { key: "timeline", label: "Timeline" },
-    { key: "playlist", label: "Playlist" },
-    { key: "letter", label: "Sorry Letter" },
-    { key: "wishes", label: "Wishes" },
-  ];
 
   return (
-    <div onClick={spawnHearts}>
-      {hearts.map(h => (
-        <HeartBurst key={h.id} x={h.x} y={h.y} onDone={() => setHearts(hs => hs.filter(x => x.id !== h.id))} />
-      ))}
+    <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(10,5,20,0.95)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center"}}>
+      <div onClick={(e) => e.stopPropagation()} style={{position:"relative",maxWidth:"min(90vw,700px)",width:"100%"}}>
+        <div style={{position:"relative",borderRadius:24,overflow:"hidden",boxShadow:"0 40px 120px rgba(0,0,0,0.6)"}}>
+          <img src={photo.image} alt={photo.caption} style={{width:"100%",maxHeight:"80vh",objectFit:"cover",display:"block"}}/>
+          <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"24px",background:"linear-gradient(to top,rgba(20,10,40,0.95),transparent)"}}>
+            <div style={{color:"white",fontFamily:"'Playfair Display', serif",fontSize:20}}>{photo.caption}</div>
+            <div style={{color:"rgba(255,255,255,0.6)",fontSize:12}}>{photo.date}</div>
+          </div>
+        </div>
+        <button onClick={onPrev} style={{position:"absolute",left:-60,top:"50%",transform:"translateY(-50%)",background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.15)",color:"white",width:44,height:44,borderRadius:"50%",fontSize:18,cursor:"pointer"}}>◀</button>
+        <button onClick={onNext} style={{position:"absolute",right:-60,top:"50%",transform:"translateY(-50%)",background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.15)",color:"white",width:44,height:44,borderRadius:"50%",fontSize:18,cursor:"pointer"}}>▶</button>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:16,padding:"0 4px"}}>
+          <span style={{color:"rgba(255,255,255,0.4)",fontSize:13}}>{idx+1} / {total}</span>
+          <button onClick={onClose} style={{background:"none",border:"1px solid rgba(255,255,255,0.2)",color:"rgba(255,255,255,0.7)",padding:"6px 18px",borderRadius:20,fontSize:13,cursor:"pointer"}}>Close ✕</button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-      {/* Announce */}
-      <div className="announce">
-        <div className="announce-inner">{tickerText.repeat(3)}</div>
+function MasonryGallery() {
+  const [lb, setLb] = useState(null);
+  const heights = ["340px","280px","380px","310px","360px","290px","330px"];
+  return (
+    <>
+      {lb !== null && (
+        <Lightbox photo={PHOTOS[lb]} idx={lb} total={PHOTOS.length} onClose={() => setLb(null)}
+          onPrev={() => setLb((i) => (i - 1 + PHOTOS.length) % PHOTOS.length)}
+          onNext={() => setLb((i) => (i + 1) % PHOTOS.length)}/>
+      )}
+      <div style={{columns:"3 280px",columnGap:16,maxWidth:900,margin:"0 auto"}}>
+        {PHOTOS.map((ph, i) => (
+          <div key={i} onClick={() => setLb(i)}
+            style={{breakInside:"avoid",marginBottom:16,borderRadius:20,overflow:"hidden",height:heights[i],position:"relative",cursor:"pointer",boxShadow:"0 6px 28px rgba(0,0,0,0.12)"}}>
+            <img src={ph.image} alt={ph.caption} style={{width:"100%",height:"100%",objectFit:"cover",transition:"transform 0.5s ease"}}/>
+            <div style={{position:"absolute",inset:0,background:"linear-gradient(to top, rgba(30,16,48,0.9), transparent)",display:"flex",flexDirection:"column",justifyContent:"flex-end",padding:"20px"}}>
+              <div style={{color:"white",fontFamily:"'Playfair Display', serif",fontSize:16}}>{ph.caption}</div>
+              <div style={{color:"rgba(255,255,255,0.7)",fontSize:12}}>{ph.date}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function FadeIn({children, delay=0}) {
+  const ref=useRef();
+  const [vis,setVis]=useState(false);
+  useEffect(()=>{
+    const obs=new IntersectionObserver(([e])=>{if(e.isIntersecting){setVis(true);obs.disconnect();}},{threshold:0.12});
+    if(ref.current)obs.observe(ref.current);
+    return()=>obs.disconnect();
+  },[]);
+  return <div ref={ref} style={{opacity:vis?1:0,transform:vis?"translateY(0)":"translateY(36px)",transition:`opacity 0.8s ${delay}s ease, transform 0.8s ${delay}s ease`}}>{children}</div>;
+}
+
+function LoginScreen({onLogin}) {
+  const [name,setName]=useState("");
+  const [pass,setPass]=useState("");
+  const [err,setErr]=useState("");
+  const [shake,setShake]=useState(false);
+
+  const attempt=()=>{
+    const n=name.trim().toLowerCase(),p=pass.trim().toLowerCase();
+    if(VALID_NAMES.includes(n)&&p===VALID_PASS){onLogin();}
+    else{setErr("💜 Hmm, that doesn't match. Try again, love!");setShake(true);setTimeout(()=>{setErr("");setShake(false);},2200);}
+  };
+
+  return (
+    <div style={{width:"100vw",minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"radial-gradient(ellipse at 30% 30%,#e8d8ff,#f5f0ff 45%,#ede8ff)",position:"relative",overflow:"hidden",padding:40,boxSizing:"border-box"}}>
+      <Particles count={28}/>
+      <div style={{background:"rgba(255,255,255,0.85)",backdropFilter:"blur(24px)",border:"1.5px solid rgba(201,184,232,0.7)",borderRadius:32,padding:"52px 48px",width:"100%",maxWidth:440,zIndex:2,textAlign:"center",animation:shake?"loginAppear 0.9s ease both, shake 0.45s ease":"loginAppear 0.9s ease both",boxShadow:"0 32px 80px rgba(124,92,191,0.16)"}}>
+        <div style={{fontSize:28,letterSpacing:14,animation:"heartBeat 2.2s ease-in-out infinite",display:"block",marginBottom:24}}>♥ ♥ ♥</div>
+        <h1 style={{fontFamily:"'Playfair Display',serif",fontSize:36,fontWeight:700,fontStyle:"italic",background:"linear-gradient(90deg,#7c5cbf,#b49de0,#9b7fd4,#b49de0,#7c5cbf)",backgroundSize:"300% auto",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",animation:"shimmer 4s linear infinite",lineHeight:1.2,marginBottom:10}}>A Little Something<br/>Just for You</h1>
+        <p style={{fontSize:11,color:"#6b5490",letterSpacing:"1.8px",marginBottom:36,textTransform:"uppercase"}}>Private · Made with love · Only for you 🌸</p>
+        {[{label:"Your name",val:name,set:setName,type:"text",ph:"Enter your name…"},
+          {label:"Secret password",val:pass,set:setPass,type:"password",ph:"Enter password…"}].map(f=>(
+          <div key={f.label} style={{textAlign:"left",marginBottom:18}}>
+            <label style={{fontSize:10,textTransform:"uppercase",letterSpacing:"1.8px",color:"#6b5490",marginBottom:7,display:"block"}}>{f.label}</label>
+            <input type={f.type} value={f.val} onChange={e=>f.set(e.target.value)} placeholder={f.ph} onKeyDown={e=>e.key==="Enter"&&attempt()}
+              style={{width:"100%",padding:"14px 18px",border:"1.5px solid #c9b8e8",borderRadius:14,fontSize:14,fontFamily:"inherit",color:"#1e1030",background:"rgba(250,248,255,0.9)",outline:"none",boxSizing:"border-box"}}
+              onFocus={e=>{e.target.style.borderColor="#7c5cbf";e.target.style.boxShadow="0 0 0 3px rgba(124,92,191,0.1)"}}
+              onBlur={e=>{e.target.style.borderColor="#c9b8e8";e.target.style.boxShadow="none"}}/>
+          </div>
+        ))}
+        <div style={{fontSize:12.5,color:"#7c5cbf",minHeight:20,marginBottom:10}}>{err||" "}</div>
+        <button onClick={attempt} style={{width:"100%",padding:15,background:"#7c5cbf",color:"white",border:"none",borderRadius:16,fontSize:16,fontFamily:"'Playfair Display',serif",fontWeight:600,fontStyle:"italic",cursor:"pointer",boxShadow:"0 8px 28px rgba(124,92,191,0.32)",transition:"all 0.2s"}}
+          onMouseEnter={e=>{e.currentTarget.style.background="#5e3fa3";e.currentTarget.style.transform="translateY(-2px)"}}
+          onMouseLeave={e=>{e.currentTarget.style.background="#7c5cbf";e.currentTarget.style.transform="translateY(0)"}}>
+          Open with Love 💌
+        </button>
+        <p style={{fontSize:11,color:"#a090c8",marginTop:14,fontWeight:300}}>Psst… only one person in this world knows the password 🤫</p>
+      </div>
+    </div>
+  );
+}
+
+function MainSite() {
+  const [page,setPage]=useState("home");
+  const [hearts,setHearts]=useState([]);
+  const [wishText,setWishText]=useState("");
+  const [wishSent,setWishSent]=useState(false);
+  const [gradAngle,setGradAngle]=useState(0);
+  const [mousePos,setMousePos]=useState({x:50,y:50});
+  const [menuOpen,setMenuOpen]=useState(false);
+
+  useEffect(()=>{const t=setInterval(()=>setGradAngle(a=>a+0.3),50);return()=>clearInterval(t);},[]);
+  useEffect(()=>{
+    const fn=e=>{setMousePos({x:(e.clientX/window.innerWidth)*100,y:(e.clientY/window.innerHeight)*100});};
+    window.addEventListener("mousemove",fn);return()=>window.removeEventListener("mousemove",fn);
+  },[]);
+
+  const spawnHearts=e=>{setHearts(h=>[...h,{id:Date.now(),x:e.clientX,y:e.clientY}]);};
+
+  const nav=[
+    {k:"home",l:"Home"},{k:"story",l:"Our Story"},{k:"promises",l:"Promises"},
+    {k:"photos",l:"Gallery"},{k:"timeline",l:"Timeline"},{k:"playlist",l:"Music"},
+    {k:"letter",l:"Letter"},{k:"wishes",l:"Wishes"},
+  ];
+
+  const px=(f)=>mousePos.x*f;
+  const py=(f)=>mousePos.y*f;
+
+  const gradStyle={
+    background:`radial-gradient(ellipse at ${45+Math.sin(gradAngle*0.017)*15}% ${42+Math.cos(gradAngle*0.013)*12}%,
+      #e8d8ff 0%,#f0e8ff 30%,#ede4f7 55%,#f8f4ff 100%)`,
+  };
+
+  const goTo = (k) => { setPage(k); setMenuOpen(false); };
+
+  return (
+    <div onClick={spawnHearts} style={{width:"100vw",minHeight:"100vh",fontFamily:"'Jost',sans-serif",overflowX:"hidden",background:"#faf8ff",color:"#1e1030",boxSizing:"border-box"}}>
+      {hearts.map(h=><HeartBurst key={h.id} x={h.x} y={h.y} onDone={()=>setHearts(hs=>hs.filter(x=>x.id!==h.id))}/>)}
+
+      {/* TICKER */}
+      <div style={{background:"#7c5cbf",color:"white",fontSize:11.5,padding:"9px 0",overflow:"hidden",whiteSpace:"nowrap",letterSpacing:0.5,width:"100%"}}>
+        <div style={{display:"inline-block",animation:"ticker 28s linear infinite"}}>
+          {"✦ I'm sorry, Khushi ✦ You are my everything ✦ I miss your smile ✦ I promise I'll be better ✦ Please forgive me ✦ You deserve the world ✦ I love you, Khushi Bansal ✦ ".repeat(3)}
+        </div>
       </div>
 
-      {/* Header */}
-      <header className="site-header">
-        <div className="header-logo" onClick={() => setPage("home")}>
+      {/* NAV */}
+      <header style={{background:"rgba(255,255,255,0.92)",borderBottom:"1px solid #ede4f7",padding:"0 32px",height:64,display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:200,backdropFilter:"blur(16px)",width:"100%",boxSizing:"border-box"}}>
+        <div onClick={()=>goTo("home")} style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"#7c5cbf",cursor:"pointer",lineHeight:1,flexShrink:0}}>
           Khushi's Corner
-          <span>A love letter in code</span>
+          <span style={{fontSize:10,display:"block",fontWeight:400,color:"#6b5490",letterSpacing:"2px",fontFamily:"'Jost',sans-serif"}}>A love letter in code</span>
         </div>
-        <nav className="header-nav">
-          {navLinks.map(l => (
-            <a key={l.key} className={`nav-link ${page === l.key ? "active" : ""}`} onClick={() => setPage(l.key)}>
-              {l.label}
+        {/* Desktop nav */}
+        <nav style={{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end"}}>
+          {nav.map(l=>(
+            <a key={l.k} onClick={()=>goTo(l.k)} style={{padding:"7px 12px",borderRadius:30,fontSize:12,color:page===l.k?"#7c5cbf":"#6b5490",cursor:"pointer",background:page===l.k?"#f3eeff":"transparent",border:`1px solid ${page===l.k?"#c9b8e8":"transparent"}`,transition:"all 0.2s",fontWeight:page===l.k?500:400,textDecoration:"none",whiteSpace:"nowrap"}}>
+              {l.l}
             </a>
           ))}
         </nav>
       </header>
 
-      {/* ── HOME ── */}
-      <div className={`page ${page === "home" ? "active" : ""}`}>
-        <section className="hero">
-          <FloatingPetals count={26} />
-          <div className="hero-content">
-            <span className="hero-tag">✦ For Khushi Bansal · With all my love ✦</span>
-            <h1 className="hero-h1">
-              Where <em>Romance</em><br />Finds Its Way Back
-            </h1>
-            <p className="hero-p">
-              A little corner of the internet built entirely for you — to say sorry, to make promises, and to remind you just how much you mean to me.
-            </p>
-            <div className="hero-actions">
-              <button className="btn-primary" onClick={() => setPage("letter")}>Read My Heart 💕</button>
-              <button className="btn-ghost" onClick={() => setPage("promises")}>My Promises 🤝</button>
-            </div>
-            <div className="hero-stats">
-              <div className="stat-item"><div className="stat-num">6</div><div className="stat-label">Promises Made</div></div>
-              <div className="stat-item"><div className="stat-num">∞</div><div className="stat-label">Love Given</div></div>
-              <div className="stat-item"><div className="stat-num">1</div><div className="stat-label">Person in Mind</div></div>
-            </div>
-          </div>
-          <div className="hero-scroll" onClick={() => setPage("story")}>↓</div>
-        </section>
-      </div>
-
-      {/* ── OUR STORY ── */}
-      <div className={`page ${page === "story" ? "active" : ""}`}>
-        <section className="section" style={{ background: "radial-gradient(ellipse at 60% 40%, #e8d8ff 0%, #f5f0ff 50%, #ede8ff 100%)" }}>
-          <div className="story-grid">
-            <div className="story-img-wrap">
-              <div className="story-img">🌸</div>
-              <div className="story-badge">💞</div>
-            </div>
-            <div className="story-text">
-              <p className="section-label">Discover</p>
-              <h2 className="section-h2">Our Story Is <em>Worth</em> Fighting For</h2>
-              <p>Every love story has its bumps — ours is no different. But what makes ours special is <em>you</em>, Khushi. Your warmth, your laughter, your everything.</p>
-              <p>I messed up, and I own that completely. This page is my way of reaching out when words alone feel too small. Because you deserve more than just words.</p>
-              <p>You are the person I think about first when something good happens, and the person I want to hold when something goes wrong. That doesn't change. That will never change.</p>
-              <button className="story-btn" onClick={() => setPage("timeline")}>See Our Timeline 💞</button>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      {/* ── PROMISES ── */}
-      <div className={`page ${page === "promises" ? "active" : ""}`}>
-        <section className="section promises-bg">
-          <div style={{ textAlign: "center" }}>
-            <p className="section-label">From the heart</p>
-            <h2 className="section-h2" style={{ maxWidth: 500, margin: "0 auto" }}>My <em>Promises</em> to You, Khushi</h2>
-          </div>
-          <div className="promises-grid">
-            {promises.map((p, i) => (
-              <div className="promise-card" key={i}>
-                <span className="promise-num">{p.n}</span>
-                <span className="promise-icon">{p.icon}</span>
-                <h3>{p.title}</h3>
-                <p>{p.body}</p>
+      {/* HOME */}
+      {page==="home" && (
+        <section style={{...gradStyle,minHeight:"calc(100vh - 102px)",width:"100%",display:"flex",alignItems:"center",justifyContent:"center",position:"relative",overflow:"hidden",padding:"80px 40px",boxSizing:"border-box"}}>
+          <Particles count={32}/>
+          <div style={{position:"absolute",width:500,height:500,borderRadius:"50%",background:"radial-gradient(circle,rgba(180,157,224,0.18),transparent 70%)",left:`calc(${px(0.08)}% - 200px)`,top:`calc(${py(0.08)}% - 200px)`,pointerEvents:"none",transition:"left 0.1s,top 0.1s"}}/>
+          <div style={{textAlign:"center",zIndex:2,position:"relative",maxWidth:620,width:"100%"}}>
+            <FadeIn><span style={{display:"inline-block",background:"rgba(124,92,191,0.08)",color:"#7c5cbf",fontSize:11,letterSpacing:3,padding:"7px 22px",borderRadius:20,border:"1px solid rgba(124,92,191,0.2)",marginBottom:28,textTransform:"uppercase"}}>✦ For Khushi Bansal · With all my love ✦</span></FadeIn>
+            <FadeIn delay={0.15}>
+              <h1 style={{fontFamily:"'Playfair Display',serif",fontSize:"clamp(40px,7vw,76px)",fontWeight:700,lineHeight:1.1,color:"#3b2070",marginBottom:26}}>
+                Where <em style={{fontStyle:"italic",color:"#7c5cbf"}}>Romance</em><br/>Finds Its Way Back
+              </h1>
+            </FadeIn>
+            <FadeIn delay={0.3}><p style={{fontSize:16,color:"#6b5490",lineHeight:2,maxWidth:460,margin:"0 auto 40px",fontWeight:300}}>A little corner of the internet built entirely for you — to say sorry, to make promises, and to remind you just how much you mean to me.</p></FadeIn>
+            <FadeIn delay={0.45}>
+              <div style={{display:"flex",gap:14,justifyContent:"center",flexWrap:"wrap"}}>
+                <button onClick={()=>goTo("letter")} style={{padding:"15px 36px",background:"#7c5cbf",color:"white",border:"none",borderRadius:40,fontSize:15,fontFamily:"'Playfair Display',serif",fontWeight:600,fontStyle:"italic",cursor:"pointer",boxShadow:"0 8px 30px rgba(124,92,191,0.32)",transition:"all 0.22s"}}
+                  onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-3px)"}}
+                  onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)"}}>
+                  Read My Heart 💕
+                </button>
+                <button onClick={()=>goTo("promises")} style={{padding:"15px 36px",background:"transparent",color:"#7c5cbf",border:"1.5px solid #7c5cbf",borderRadius:40,fontSize:15,fontFamily:"'Playfair Display',serif",fontWeight:600,fontStyle:"italic",cursor:"pointer",transition:"all 0.22s"}}
+                  onMouseEnter={e=>{e.currentTarget.style.background="#f3eeff";e.currentTarget.style.transform="translateY(-2px)"}}
+                  onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.transform="translateY(0)"}}>
+                  My Promises 🤝
+                </button>
               </div>
+            </FadeIn>
+            <FadeIn delay={0.6}>
+              <div style={{display:"flex",gap:48,justifyContent:"center",marginTop:52,flexWrap:"wrap"}}>
+                {[["6","Promises Made"],["∞","Love Given"],["1","Person in Mind"]].map(([n,l])=>(
+                  <div key={l} style={{textAlign:"center"}}>
+                    <div style={{fontFamily:"'Playfair Display',serif",fontSize:34,fontWeight:700,color:"#7c5cbf",lineHeight:1}}>{n}</div>
+                    <div style={{fontSize:11,color:"#6b5490",letterSpacing:"1.5px",marginTop:5,textTransform:"uppercase"}}>{l}</div>
+                  </div>
+                ))}
+              </div>
+            </FadeIn>
+          </div>
+          <div onClick={()=>goTo("story")} style={{position:"absolute",bottom:36,left:"50%",transform:"translateX(-50%)",fontSize:24,animation:"bounce 2.2s ease-in-out infinite",color:"#7c5cbf",opacity:0.6,cursor:"pointer"}}>↓</div>
+        </section>
+      )}
+
+      {/* STORY */}
+      {page==="story" && (
+        <section style={{...gradStyle,padding:"100px 5vw",minHeight:"calc(100vh - 102px)",width:"100%",boxSizing:"border-box"}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:72,alignItems:"center",maxWidth:880,margin:"0 auto"}}>
+            <FadeIn>
+              <div style={{position:"relative"}}>
+                <div style={{width:"100%",aspectRatio:1,borderRadius:32,background:"linear-gradient(135deg,#ede4f7,#d8c8f0,#e8d8ff)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:100,boxShadow:"0 28px 70px rgba(124,92,191,0.16), 0 0 0 1px rgba(201,184,232,0.5)"}}>🌸</div>
+                <div style={{position:"absolute",bottom:-20,right:-20,background:"#7c5cbf",color:"white",borderRadius:"50%",width:76,height:76,display:"flex",alignItems:"center",justifyContent:"center",fontSize:30,boxShadow:"0 10px 28px rgba(124,92,191,0.38)",border:"3px solid white"}}>💞</div>
+              </div>
+            </FadeIn>
+            <FadeIn delay={0.2}>
+              <div>
+                <p style={{fontSize:10,letterSpacing:"3.5px",color:"#7c5cbf",textTransform:"uppercase",marginBottom:12}}>Discover</p>
+                <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:"clamp(28px,4vw,44px)",fontWeight:700,color:"#3b2070",lineHeight:1.22,marginBottom:20}}>Our Story Is <em style={{fontStyle:"italic"}}>Worth</em> Fighting For</h2>
+                {["Every love story has its bumps — ours is no different. But what makes ours special is you, Khushi. Your warmth, your laughter, your everything.",
+                  "I messed up, and I own that completely. This page is my way of reaching out when words alone feel too small. Because you deserve more than just words.",
+                  "You are the person I think about first when something good happens, and the person I want to hold when something goes wrong. That doesn't change."].map((t,i)=>(
+                  <p key={i} style={{fontSize:15.5,color:"#6b5490",lineHeight:2.1,fontWeight:300,marginBottom:16}}>{t}</p>
+                ))}
+                <button onClick={()=>goTo("timeline")} style={{marginTop:8,padding:"13px 32px",background:"transparent",border:"1.5px solid #7c5cbf",color:"#7c5cbf",borderRadius:30,fontSize:14,fontFamily:"'Playfair Display',serif",fontWeight:600,fontStyle:"italic",cursor:"pointer",transition:"all 0.2s"}}
+                  onMouseEnter={e=>{e.currentTarget.style.background="#7c5cbf";e.currentTarget.style.color="white"}}
+                  onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="#7c5cbf"}}>
+                  See Our Timeline 💞
+                </button>
+              </div>
+            </FadeIn>
+          </div>
+        </section>
+      )}
+
+      {/* PROMISES */}
+      {page==="promises" && (
+        <section style={{padding:"100px 5vw",background:"white",minHeight:"calc(100vh - 102px)",width:"100%",boxSizing:"border-box"}}>
+          <FadeIn><div style={{textAlign:"center"}}>
+            <p style={{fontSize:10,letterSpacing:"3.5px",color:"#7c5cbf",textTransform:"uppercase",marginBottom:12}}>From the heart</p>
+            <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:"clamp(28px,5vw,46px)",fontWeight:700,color:"#3b2070",maxWidth:500,margin:"0 auto"}}>My <em style={{fontStyle:"italic"}}>Promises</em> to You, Khushi</h2>
+          </div></FadeIn>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:22,maxWidth:880,margin:"52px auto 0"}}>
+            {PROMISES.map((p,i)=>(
+              <FadeIn key={i} delay={i*0.1}>
+                <div style={{background:"#f3eeff",border:"1px solid rgba(201,184,232,0.5)",borderRadius:24,padding:"32px 26px",position:"relative",overflow:"hidden",transition:"transform 0.25s, box-shadow 0.25s",cursor:"default"}}
+                  onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-8px)";e.currentTarget.style.boxShadow="0 24px 60px rgba(124,92,191,0.13)"}}
+                  onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="none"}}>
+                  <div style={{position:"absolute",top:16,right:20,fontFamily:"'Playfair Display',serif",fontSize:56,fontWeight:700,color:"rgba(124,92,191,0.06)",lineHeight:1}}>0{i+1}</div>
+                  <span style={{fontSize:42,marginBottom:16,display:"block"}}>{p.icon}</span>
+                  <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:19,color:"#7c5cbf",marginBottom:10,fontWeight:700}}>{p.title}</h3>
+                  <p style={{fontSize:13.5,color:"#6b5490",lineHeight:1.9,fontWeight:300}}>{p.body}</p>
+                </div>
+              </FadeIn>
             ))}
           </div>
         </section>
-      </div>
+      )}
 
-      {/* ── PHOTOS ── */}
-      <div className={`page ${page === "photos" ? "active" : ""}`}>
-        <section className="section photos-bg">
-          <div className="photos-header">
-            <p className="section-label">Gallery of us</p>
-            <h2 className="section-h2"><em>Moments</em> That Live in My Heart</h2>
-            <p style={{ fontSize: 15, color: "var(--muted)", maxWidth: 440, margin: "0 auto", fontWeight: 300, lineHeight: 1.9 }}>
-              Every photo is a memory. Every memory is proof of something real and beautiful.
-            </p>
-          </div>
-          <div className="photo-grid">
-            <div className="photo-card photo-featured">
-              <div className="photo-inner" style={{ padding: 0 }}>
-                <img src={photos[0].image} alt={photos[0].caption} />
-              </div>
-              <div className="photo-overlay" style={{ opacity: 1, background: "linear-gradient(to top, rgba(59,32,112,0.8) 0%, transparent 50%)" }}>
-                <div className="photo-caption">{photos[0].caption}</div>
-                <div className="photo-date">{photos[0].date}</div>
-              </div>
+      {/* PHOTOS */}
+      {page==="photos" && (
+        <section style={{padding:"100px 5vw",background:"white",minHeight:"calc(100vh - 102px)",width:"100%",boxSizing:"border-box"}}>
+          <FadeIn>
+            <div style={{textAlign:"center",marginBottom:52}}>
+              <p style={{fontSize:10,letterSpacing:"3.5px",color:"#7c5cbf",textTransform:"uppercase",marginBottom:12}}>Gallery of us</p>
+              <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:"clamp(28px,5vw,46px)",fontWeight:700,color:"#3b2070",marginBottom:16}}><em style={{fontStyle:"italic"}}>Moments</em> That Live in My Heart</h2>
+              <p style={{fontSize:15,color:"#6b5490",maxWidth:440,margin:"0 auto",fontWeight:300,lineHeight:1.9}}>Every photo is a memory. Every memory is proof of something real and beautiful. Click to open.</p>
             </div>
-            {photos.slice(1).map((ph, i) => (
-              <div className="photo-card" key={i}>
-                <div className="photo-inner" style={{ padding: 0 }}>
-                  <img src={ph.image} alt={ph.caption} />
+          </FadeIn>
+          <MasonryGallery/>
+        </section>
+      )}
+
+      {/* TIMELINE */}
+      {page==="timeline" && (
+        <section style={{padding:"100px 5vw",background:"radial-gradient(ellipse at 70% 30%,#f3eeff,#faf8ff 60%)",minHeight:"calc(100vh - 102px)",width:"100%",boxSizing:"border-box"}}>
+          <FadeIn>
+            <div style={{textAlign:"center",marginBottom:64}}>
+              <p style={{fontSize:10,letterSpacing:"3.5px",color:"#7c5cbf",textTransform:"uppercase",marginBottom:12}}>Our journey</p>
+              <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:"clamp(28px,5vw,46px)",fontWeight:700,color:"#3b2070"}}>The Story of <em style={{fontStyle:"italic"}}>Us</em></h2>
+            </div>
+          </FadeIn>
+          <div style={{maxWidth:680,margin:"0 auto",position:"relative"}}>
+            <div style={{position:"absolute",left:36,top:20,bottom:20,width:2,background:"linear-gradient(to bottom,#c9b8e8,#7c5cbf,#c9b8e8)",borderRadius:2}}/>
+            {TIMELINE.map((t,i)=>(
+              <FadeIn key={i} delay={i*0.1}>
+                <div style={{display:"flex",gap:32,marginBottom:48,alignItems:"flex-start"}}>
+                  <div style={{width:72,height:72,borderRadius:"50%",background:"white",border:"3px solid #7c5cbf",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,flexShrink:0,position:"relative",zIndex:1,boxShadow:"0 6px 22px rgba(124,92,191,0.18)"}}>{t.icon}</div>
+                  <div style={{background:"white",borderRadius:20,padding:"24px 28px",flex:1,border:"1px solid rgba(201,184,232,0.5)",boxShadow:"0 4px 20px rgba(124,92,191,0.07)"}}>
+                    <span style={{fontSize:11,color:"#9b7fd4",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:10,display:"block"}}>{t.date}</span>
+                    <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:20,color:"#7c5cbf",marginBottom:8,fontWeight:700}}>{t.title}</h3>
+                    <p style={{fontSize:14,color:"#6b5490",lineHeight:1.9,fontWeight:300}}>{t.body}</p>
+                  </div>
                 </div>
-                <div className="photo-overlay">
-                  <div className="photo-caption">{ph.caption}</div>
-                  <div className="photo-date">{ph.date}</div>
-                </div>
-              </div>
+              </FadeIn>
             ))}
           </div>
         </section>
-      </div>
+      )}
 
-      {/* ── TIMELINE ── */}
-      <div className={`page ${page === "timeline" ? "active" : ""}`}>
-        <section className="section timeline-bg">
-          <div style={{ textAlign: "center", marginBottom: 64 }}>
-            <p className="section-label">Our journey</p>
-            <h2 className="section-h2">The Story of <em>Us</em></h2>
-          </div>
-          <div className="timeline-wrap">
-            <div className="timeline-line"></div>
-            {timeline.map((t, i) => (
-              <div className="timeline-item" key={i} style={{ animationDelay: `${i * 0.1}s` }}>
-                <div className="timeline-dot">{t.icon}</div>
-                <div className="timeline-body">
-                  <span className="tl-date">{t.date}</span>
-                  <h3>{t.title}</h3>
-                  <p>{t.body}</p>
-                </div>
+      {/* LETTER */}
+      {page==="letter" && (
+        <section style={{padding:"100px 5vw",background:"radial-gradient(ellipse at center,#f3eeff,#faf8ff)",minHeight:"calc(100vh - 102px)",width:"100%",boxSizing:"border-box"}}>
+          <FadeIn>
+            <div style={{textAlign:"center",marginBottom:44}}>
+              <p style={{fontSize:10,letterSpacing:"3.5px",color:"#7c5cbf",textTransform:"uppercase",marginBottom:12}}>From me, to you</p>
+              <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:"clamp(28px,5vw,46px)",fontWeight:700,color:"#3b2070"}}>A <em style={{fontStyle:"italic"}}>Letter</em> from My Heart</h2>
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.2}>
+            <div style={{maxWidth:640,margin:"0 auto",background:"white",borderRadius:28,padding:"56px 48px",boxShadow:"0 36px 90px rgba(124,92,191,0.10), 0 0 0 1px rgba(201,184,232,0.4)",position:"relative",overflow:"hidden",boxSizing:"border-box"}}>
+              <div style={{position:"absolute",top:0,left:0,right:0,height:6,background:"linear-gradient(90deg,#7c5cbf,#b49de0,#9b7fd4,#b49de0,#7c5cbf)"}}/>
+              <div style={{position:"absolute",top:28,right:40,fontFamily:"'Playfair Display',serif",fontSize:140,fontWeight:700,color:"rgba(124,92,191,0.04)",lineHeight:1,pointerEvents:"none"}}>"</div>
+              <p style={{fontSize:12,color:"#a090c8",letterSpacing:"1.2px",marginBottom:26}}>June 2026 · Written with love and regret</p>
+              <p style={{fontFamily:"'Playfair Display',serif",fontSize:28,fontStyle:"italic",color:"#7c5cbf",marginBottom:24}}>Dearest Khushi,</p>
+              <div style={{fontSize:15.5,color:"#6b5490",lineHeight:2.15,fontWeight:300}}>
+                {["I know that \"sorry\" sometimes feels like just a word. But I need you to know that this one comes from the deepest, most honest part of me.",
+                  "I made a mistake — and seeing you hurt because of something I did is something I never, ever want to feel again. You don't deserve pain. You deserve someone who is consistent, kind, thoughtful, and shows up fully for you every single day.",
+                  "I'm not asking you to forget. I'm asking for the chance to prove to you that I've understood, that I've grown, and that you are worth every effort it takes to become better.",
+                  "You are the first thought in my morning and the last in my night. You are the reason I want to be a better person. Not because I have to — but because you deserve nothing less.",
+                  "You are my favourite person in this world, Khushi Bansal. And I promise — with everything I have — this will never happen again."].map((t,i)=>(
+                  <p key={i} style={{marginBottom:20}}>{t}</p>
+                ))}
               </div>
-            ))}
-          </div>
+              <div style={{marginTop:38,display:"flex",flexDirection:"column",alignItems:"flex-end",gap:4}}>
+                <p style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontStyle:"italic",color:"#7c5cbf"}}>— Yours always, forever 💌</p>
+              </div>
+              <div style={{fontSize:24,letterSpacing:8,marginTop:20,textAlign:"center"}}>♥ ♥ ♥</div>
+            </div>
+          </FadeIn>
         </section>
-      </div>
+      )}
 
-      {/* ── LETTER ── */}
-      <div className={`page ${page === "letter" ? "active" : ""}`}>
-        <section className="section letter-bg">
-          <div className="letter-wrap">
-            <div style={{ textAlign: "center", marginBottom: 44 }}>
-              <p className="section-label">From me, to you</p>
-              <h2 className="section-h2">A <em>Letter</em> from My Heart</h2>
+      {/* PLAYLIST */}
+      {page==="playlist" && (
+        <section style={{padding:"100px 5vw",background:"linear-gradient(160deg,#0d0520,#1a0a35,#100825)",minHeight:"calc(100vh - 102px)",width:"100%",boxSizing:"border-box"}}>
+          <FadeIn>
+            <div style={{textAlign:"center",marginBottom:52}}>
+              <p style={{fontSize:10,letterSpacing:"3.5px",color:"#c084fc",textTransform:"uppercase",marginBottom:12}}>Songs for you</p>
+              <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:"clamp(28px,5vw,46px)",fontWeight:700,color:"white",marginBottom:10}}>A <em style={{fontStyle:"italic",color:"#c084fc"}}>Playlist</em> That Thinks of You</h2>
+              <p style={{fontSize:15,color:"rgba(255,255,255,0.45)",maxWidth:460,margin:"0 auto",fontWeight:300,lineHeight:1.9}}>Every time one of these songs plays, you're all I think about.</p>
             </div>
-            <div className="letter-paper">
-              <p className="letter-date">June 2026 · Written with love and regret</p>
-              <p className="letter-salute">Dearest Khushi,</p>
-              <div className="letter-body">
-                <p>I know that "sorry" sometimes feels like just a word. But I need you to know that this one comes from the deepest, most honest part of me.</p>
-                <p>I made a mistake — and seeing you hurt because of something I did is something I never, ever want to feel again. You don't deserve pain. You deserve someone who is consistent, kind, thoughtful, and shows up fully for you every single day.</p>
-                <p>I'm not asking you to forget. I'm asking for the chance to <em>prove</em> to you that I've understood, that I've grown, and that you are worth every effort it takes to become better.</p>
-                <p>You are the first thought in my morning and the last in my night. You are the reason I want to be a better person. Not because I have to — but because you deserve nothing less.</p>
-                <p>You are my favourite person in this world, Khushi Bansal. And I promise — with everything I have — this will never happen again.</p>
-              </div>
-              <div className="letter-sign-wrap">
-                <p className="letter-sign">— Yours always, forever 💌</p>
-              </div>
-              <div className="letter-hearts">♥ ♥ ♥</div>
-            </div>
-          </div>
+          </FadeIn>
+          <FadeIn delay={0.2}><MusicPlayer/></FadeIn>
         </section>
-      </div>
+      )}
 
-      {/* ── PLAYLIST ── */}
-      <div className={`page ${page === "playlist" ? "active" : ""}`}>
-        <section className="section playlist-bg">
-          <div className="playlist-header">
-            <p className="section-label">Songs for you</p>
-            <h2 className="section-h2">A <em>Playlist</em> That Thinks of You</h2>
-            <p style={{ fontSize: 15, color: "var(--muted)", maxWidth: 460, margin: "10px auto 0", fontWeight: 300, lineHeight: 1.9 }}>
-              Every time one of these songs plays, you're all I think about.
-            </p>
-          </div>
-          <div className="playlist-wrap">
-            {songs.map((s, i) => (
-              <div
-                className={`playlist-card ${playingIdx === i ? "playing" : ""}`}
-                key={i}
-                onClick={() => setPlayingIdx(playingIdx === i ? null : i)}
-              >
-                <div className="song-num">{String(i + 1).padStart(2, "0")}</div>
-                <div className="song-info">
-                  <div className="song-title">{s.title}</div>
-                  <div className="song-artist">{s.artist}</div>
-                  {playingIdx === i && <div className="song-reason">"{s.reason}"</div>}
-                </div>
-                <div className="song-emoji">{playingIdx === i ? "💜" : s.emoji}</div>
-                <div className="song-dur">{s.dur}</div>
+      {/* WISHES */}
+      {page==="wishes" && (
+        <section style={{padding:"100px 5vw",background:"radial-gradient(ellipse at center,#f3eeff,#faf8ff)",minHeight:"calc(100vh - 102px)",width:"100%",boxSizing:"border-box"}}>
+          <div style={{maxWidth:680,margin:"0 auto"}}>
+            <FadeIn>
+              <div style={{textAlign:"center",marginBottom:52}}>
+                <p style={{fontSize:10,letterSpacing:"3.5px",color:"#7c5cbf",textTransform:"uppercase",marginBottom:12}}>From my heart</p>
+                <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:"clamp(28px,5vw,46px)",fontWeight:700,color:"#3b2070"}}>My <em style={{fontStyle:"italic"}}>Wishes</em> for You</h2>
               </div>
-            ))}
-            <div className="playlist-note">
-              <p>💜 These songs carry everything I couldn't say out loud. Put them on, close your eyes, and know that every word was written for someone like you.</p>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      {/* ── WISHES ── */}
-      <div className={`page ${page === "wishes" ? "active" : ""}`}>
-        <section className="section wish-bg">
-          <div className="wish-wrap">
-            <div style={{ textAlign: "center", marginBottom: 52 }}>
-              <p className="section-label">From my heart</p>
-              <h2 className="section-h2">My <em>Wishes</em> for You</h2>
-            </div>
-            <div className="wish-grid">
-              {wishes.map((w, i) => (
-                <div className="wish-card" key={i}>
-                  <div className="wish-card-icon">{w.icon}</div>
-                  <h3>{w.title}</h3>
-                  <p>{w.body}</p>
-                </div>
+            </FadeIn>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:20,marginBottom:40}}>
+              {WISHES.map((w,i)=>(
+                <FadeIn key={i} delay={i*0.1}>
+                  <div style={{background:"white",borderRadius:22,padding:"28px 26px",border:"1px solid rgba(201,184,232,0.5)",boxShadow:"0 6px 28px rgba(124,92,191,0.07)",transition:"transform 0.25s",cursor:"default"}}
+                    onMouseEnter={e=>e.currentTarget.style.transform="translateY(-4px)"}
+                    onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}>
+                    <div style={{fontSize:38,marginBottom:14}}>{w.icon}</div>
+                    <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:18,color:"#7c5cbf",marginBottom:8}}>{w.title}</h3>
+                    <p style={{fontSize:13.5,color:"#6b5490",lineHeight:1.9,fontWeight:300}}>{w.body}</p>
+                  </div>
+                </FadeIn>
               ))}
             </div>
-            <div className="wish-message">
-              <p className="section-label" style={{ textAlign: "center" }}>leave a message</p>
-              <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 24, color: "var(--rose)", marginBottom: 10 }}>
-                Say Something to Me, Khushi 💌
-              </h3>
-              <p style={{ fontSize: 14, color: "var(--muted)", fontWeight: 300 }}>Whatever's on your heart. I'm listening.</p>
-              {!wishSent ? (
-                <>
-                  <textarea
-                    className="wish-input-area"
-                    rows={4}
-                    placeholder="Type your message here… 🌸"
-                    value={wishText}
-                    onChange={e => setWishText(e.target.value)}
-                  />
-                  <button className="wish-submit" onClick={() => { if (wishText.trim()) setWishSent(true); }}>
-                    Send with Love 💕
-                  </button>
-                </>
-              ) : (
-                <div style={{ marginTop: 24 }}>
-                  <div style={{ fontSize: 52, marginBottom: 16 }}>💌</div>
-                  <p style={{ fontFamily: "'Playfair Display',serif", fontSize: 20, color: "var(--rose)", fontStyle: "italic", marginBottom: 10 }}>
-                    Received with all my love
-                  </p>
-                  <div className="wish-response" style={{ display: "block" }}>
-                    Your message: "{wishText}"<br /><br />
-                    Thank you for writing to me, Khushi. Every word from you means the whole world. I will carry this with me always. 🌸
+            <FadeIn delay={0.4}>
+              <div style={{background:"white",borderRadius:28,padding:"44px 40px",boxShadow:"0 28px 80px rgba(124,92,191,0.10)",border:"1px solid rgba(201,184,232,0.4)",textAlign:"center",position:"relative",overflow:"hidden",boxSizing:"border-box"}}>
+                <div style={{position:"absolute",top:0,left:0,right:0,height:5,background:"linear-gradient(90deg,#7c5cbf,#9b7fd4,#7c5cbf)"}}/>
+                <p style={{fontSize:10,letterSpacing:"3.5px",color:"#7c5cbf",textTransform:"uppercase",marginBottom:12}}>leave a message</p>
+                <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:24,color:"#7c5cbf",marginBottom:10}}>Say Something to Me, Khushi 💌</h3>
+                <p style={{fontSize:14,color:"#6b5490",fontWeight:300}}>Whatever's on your heart. I'm listening.</p>
+                {!wishSent ? (
+                  <>
+                    <textarea rows={4} value={wishText} onChange={e=>setWishText(e.target.value)} placeholder="Type your message here… 🌸"
+                      style={{width:"100%",border:"1.5px solid #c9b8e8",borderRadius:16,padding:"16px 18px",fontSize:14.5,fontFamily:"inherit",color:"#1e1030",resize:"none",outline:"none",lineHeight:1.7,margin:"20px 0",background:"#faf8ff",boxSizing:"border-box",transition:"border-color 0.2s"}}
+                      onFocus={e=>e.target.style.borderColor="#7c5cbf"} onBlur={e=>e.target.style.borderColor="#c9b8e8"}/>
+                    <button onClick={()=>{if(wishText.trim())setWishSent(true);}} style={{padding:"14px 42px",background:"#7c5cbf",color:"white",border:"none",borderRadius:40,fontSize:15,fontFamily:"'Playfair Display',serif",fontWeight:600,fontStyle:"italic",cursor:"pointer",boxShadow:"0 6px 24px rgba(124,92,191,0.28)",transition:"all 0.2s"}}
+                      onMouseEnter={e=>{e.currentTarget.style.background="#5e3fa3";e.currentTarget.style.transform="translateY(-2px)"}}
+                      onMouseLeave={e=>{e.currentTarget.style.background="#7c5cbf";e.currentTarget.style.transform="translateY(0)"}}>
+                      Send with Love 💕
+                    </button>
+                  </>
+                ) : (
+                  <div style={{marginTop:24}}>
+                    <div style={{fontSize:52,marginBottom:16}}>💌</div>
+                    <p style={{fontFamily:"'Playfair Display',serif",fontSize:20,color:"#7c5cbf",fontStyle:"italic",marginBottom:10}}>Received with all my love</p>
+                    <div style={{padding:"22px 26px",background:"#f3eeff",borderRadius:16,fontSize:14.5,color:"#6b5490",lineHeight:1.9,textAlign:"left",fontStyle:"italic"}}>
+                      Your message: "{wishText}"<br/><br/>
+                      Thank you for writing to me, Khushi. Every word from you means the whole world. 🌸
+                    </div>
+                    <button onClick={()=>{setWishSent(false);setWishText("");}} style={{marginTop:20,padding:"14px 32px",background:"#7c5cbf",color:"white",border:"none",borderRadius:40,fontSize:15,fontFamily:"'Playfair Display',serif",fontWeight:600,fontStyle:"italic",cursor:"pointer",transition:"all 0.2s"}}>Write Another 🌸</button>
                   </div>
-                  <button className="wish-submit" style={{ marginTop: 20 }} onClick={() => { setWishSent(false); setWishText(""); }}>
-                    Write Another 🌸
-                  </button>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            </FadeIn>
           </div>
         </section>
-      </div>
+      )}
 
-      {/* Footer */}
-      <footer className="site-footer">
-        <div className="footer-bg-text">Love</div>
-        <span className="footer-rose">🌸</span>
-        <h2 className="footer-h">Embrace the Magic of Us</h2>
-        <p className="footer-sub">Made with every bit of love in my heart · Only for Khushi Bansal · Always & Forever</p>
-        <div className="footer-hearts">♥ ♥ ♥ ♥ ♥</div>
+      {/* FOOTER */}
+      <footer style={{background:"#1e1030",color:"#d8c8f0",textAlign:"center",padding:"64px 24px",position:"relative",overflow:"hidden",width:"100%",boxSizing:"border-box"}}>
+        <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Playfair Display',serif",fontSize:200,fontWeight:700,color:"rgba(255,255,255,0.025)",pointerEvents:"none",lineHeight:1}}>Love</div>
+        <span style={{fontSize:64,display:"block",marginBottom:18}}>🌸</span>
+        <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:32,fontWeight:700,fontStyle:"italic",marginBottom:12}}>Embrace the Magic of Us</h2>
+        <p style={{fontSize:13,opacity:0.5,letterSpacing:"1.2px",fontWeight:300}}>Made with every bit of love in my heart · Only for Khushi Bansal · Always &amp; Forever</p>
+        <div style={{marginTop:28,fontSize:20,letterSpacing:10,opacity:0.4}}>♥ ♥ ♥ ♥ ♥</div>
       </footer>
     </div>
   );
-};
+}
+
+const GLOBAL_STYLES = `
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Jost:wght@300;400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; width: 100%; }
+  body { font-family: 'Jost', sans-serif; background: #faf8ff; width: 100%; overflow-x: hidden; }
+  #root { width: 100%; min-height: 100vh; }
+  @keyframes particleFloat{0%{transform:translateY(0) rotate(0deg);}33%{transform:translateY(-20px) rotate(8deg);}66%{transform:translateY(-8px) rotate(-5deg);}100%{transform:translateY(0) rotate(0deg);}}
+  @keyframes heartBeat{0%,100%{transform:scale(1);}14%{transform:scale(1.35);}28%{transform:scale(1);}42%{transform:scale(1.18);}70%{transform:scale(1);}}
+  @keyframes shimmer{0%{background-position:200% center;}100%{background-position:-200% center;}}
+  @keyframes loginAppear{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-8px);}40%,80%{transform:translateX(8px);}}
+  @keyframes heartRise{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-90px) scale(1.5);}}
+  @keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-33.33%);}}
+  @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(10px);}}
+  @keyframes barDance{from{transform:scaleY(0.4);}to{transform:scaleY(1.2);}}
+`;
 
 export default function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn,setLoggedIn]=useState(false);
   return (
     <>
-      <style>{`${fonts}${style}`}</style>
-      {!loggedIn ? <LoginScreen onLogin={() => setLoggedIn(true)} /> : <MainSite />}
+      <style>{GLOBAL_STYLES}</style>
+      {loggedIn ? <MainSite/> : <LoginScreen onLogin={()=>setLoggedIn(true)}/>}
     </>
   );
 }
-
